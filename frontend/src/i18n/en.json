@@ -1,0 +1,21 @@
+{
+  "welcome": "Justice Within Reach",
+  "hero_desc": "Lexora is a tech-driven platform empowering undertrial prisoners in India with digital legal aid, skill-based earning, and transparent grievance redressal.",
+  "nav": {
+    "ecourts": "E-Courts",
+    "skills": "Skill Earning",
+    "legal": "Legal Aid",
+    "grievance": "Grievances",
+    "login": "Login"
+  },
+  "dashboard": {
+    "family": "Family Dashboard",
+    "stats": "Case Statistics",
+    "earnings": "Earnings"
+  },
+  "voice": {
+    "listening": "Listening...",
+    "command_recognized": "Command recognized",
+    "navigating": "Navigating to {{path}}"
+  }
+}
