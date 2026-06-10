@@ -71,10 +71,10 @@ const AdminDashboard = () => {
             <p className="text-slate-500 font-medium">Real-time oversight and administrative analytics.</p>
           </div>
           <div className="flex gap-4">
-            <a href="http://localhost:5000/api/v1/admin/export/report" className="flex items-center gap-2 bg-white border border-slate-200 px-6 py-3 rounded-2xl font-bold text-sm hover:bg-slate-50 transition-all">
+            <a href="https://lexora-wz7z.onrender.com:5000/api/v1/admin/export/report" className="flex items-center gap-2 bg-white border border-slate-200 px-6 py-3 rounded-2xl font-bold text-sm hover:bg-slate-50 transition-all">
               <Download size={18} /> Export PDF
             </a>
-            <a href="http://localhost:5000/api/v1/admin/export/earnings" className="flex items-center gap-2 bg-lexora-justice text-white px-6 py-3 rounded-2xl font-bold text-sm hover:opacity-90 transition-all">
+            <a href="https://lexora-wz7z.onrender.com:5000/api/v1/admin/export/earnings" className="flex items-center gap-2 bg-lexora-justice text-white px-6 py-3 rounded-2xl font-bold text-sm hover:opacity-90 transition-all">
               <Download size={18} /> Export CSV
             </a>
           </div>

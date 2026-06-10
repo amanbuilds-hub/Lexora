@@ -14,7 +14,7 @@ const TrackGrievance = () => {
     setLoading(true);
     setError('');
     try {
-      const res = await axios.get(`http://localhost:5000/api/v1/grievance/status/${token}`);
+      const res = await axios.get(`https://lexora-wz7z.onrender.com/api/v1/grievance/status/${token}`);
       setData(res.data.data);
     } catch (err) {
       setError('Invalid token or grievance not found.');

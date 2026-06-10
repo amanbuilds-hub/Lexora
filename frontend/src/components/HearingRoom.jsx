@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import io from 'socket.io-client';
 import { Video, VideoOff, Mic, MicOff, PhoneOff, Shield } from 'lucide-react';
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'https://lexora-wz7z.onrender.com';
 const socket = io(SOCKET_URL);
 
 const HearingRoom = ({ roomId, userRole }) => {
