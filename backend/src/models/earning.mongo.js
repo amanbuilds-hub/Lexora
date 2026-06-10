@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 // 1. Skill Profile
 const SkillProfileSchema = new mongoose.Schema({
-  userId: { type: String, required: true, unique: true },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
   prisonerId: { type: String, required: true },
   primarySkill: { type: String, enum: ['carpentry', 'pottery', 'coding', 'farming', 'textile', 'none'], default: 'none' },
   assessmentResults: [{

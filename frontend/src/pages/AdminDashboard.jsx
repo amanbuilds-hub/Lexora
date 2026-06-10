@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import api from '../api/config';
+import { useNavigate } from 'react-router-dom';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
   LineChart, Line, PieChart, Pie, Cell 
@@ -15,7 +17,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/v1/admin/stats', { withCredentials: true });
+        const res = await api.get('/admin/stats');
         setStats(res.data.data);
       } catch (err) {
         // Mock data for demo

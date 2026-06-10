@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/user.mysql');
+const User = require('../models/user.mongo');
 const UserProfile = require('../models/user.profile.mongo');
-const { sequelize } = require('../config/db');
 
 // Token Utilities
 const generateTokens = (id) => {
@@ -41,17 +40,16 @@ const sendTokenResponse = async (user, statusCode, res) => {
 
 // @desc    Register Family
 exports.registerFamily = async (req, res) => {
-  const t = await sequelize.transaction();
   try {
     const { name, phone, password, prisonerName, caseType, jailLocation, age } = req.body;
 
-    // 1. Create User in MySQL
+    // 1. Create User in MongoDB
     const user = await User.create({
       name,
       phone,
       password,
       role: 'family'
-    }, { transaction: t });
+    });
 
     // 2. Create Profile in MongoDB
     await UserProfile.create({
@@ -64,10 +62,8 @@ exports.registerFamily = async (req, res) => {
     const otp = Math.floor(100000 + Math.random() * 900000);
     console.log(`[OTP Simulation] To: ${phone}, Message: Your Lexora verification code is ${otp}`);
 
-    await t.commit();
     res.status(201).json({ success: true, message: 'Family registered. Verify OTP to activate.', otp_simulated: otp });
   } catch (error) {
-    await t.rollback();
     res.status(400).json({ success: false, message: error.message });
   }
 };
@@ -105,14 +101,14 @@ exports.login = async (req, res) => {
 
     if (prisonerId && pin) {
       // Prisoner Biometric Simulation (ID + PIN)
-      user = await User.findOne({ where: { prisonerId } });
+      user = await User.findOne({ prisonerId });
       if (!user || !(await user.comparePin(pin))) {
         return res.status(401).json({ message: 'Invalid Prisoner ID or PIN' });
       }
     } else {
       // General Login (Email or Phone)
       const query = email ? { email } : { phone };
-      user = await User.findOne({ where: query });
+      user = await User.findOne(query);
       if (!user || !(await user.comparePassword(password))) {
         return res.status(401).json({ message: 'Invalid credentials' });
       }

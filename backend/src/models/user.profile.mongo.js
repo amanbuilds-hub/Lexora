@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 
 const UserProfileSchema = new mongoose.Schema({
   userId: {
-    type: String, // UUID from MySQL
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
     required: true,
     unique: true
   },

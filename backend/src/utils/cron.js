@@ -1,6 +1,5 @@
 const cron = require('node-cron');
-const { Op } = require('sequelize');
-const Case = require('../models/case.mysql');
+const Case = require('../models/case.mongo');
 
 const initCronJobs = () => {
   // Run every 24 hours at midnight
@@ -12,16 +11,10 @@ const initCronJobs = () => {
       sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
       // Find cases pending for > 6 months
-      const delayedCases = await Case.findAll({
-        where: {
-          arrestDate: {
-            [Op.lt]: sixMonthsAgo
-          },
-          currentStatus: {
-            [Op.notIn]: ['Bail Granted', 'Acquitted', 'Convicted', 'Closed']
-          },
-          isPendingFlagged: false
-        }
+      const delayedCases = await Case.find({
+        arrestDate: { $lt: sixMonthsAgo },
+        currentStatus: { $nin: ['Bail Granted', 'Acquitted', 'Convicted', 'Closed'] },
+        isPendingFlagged: false
       });
 
       for (const caseData of delayedCases) {

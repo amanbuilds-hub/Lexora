@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../api/config';
 import { ShieldAlert, CheckCircle, Copy, AlertCircle, Info } from 'lucide-react';
 
 const GrievanceForm = () => {
@@ -12,7 +12,7 @@ const GrievanceForm = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.post('http://localhost:5000/api/v1/grievance/submit', formData);
+      const res = await api.post('/grievance/submit', formData);
       setResult(res.data);
       setSubmitted(true);
     } catch (err) {

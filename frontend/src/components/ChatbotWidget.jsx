@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api/config';
 import { MessageCircle, X, Send, Bot, User, Scale } from 'lucide-react';
 
 const ChatbotWidget = () => {
@@ -24,7 +24,7 @@ const ChatbotWidget = () => {
     setLoading(true);
 
     try {
-      const res = await axios.post('http://localhost:5000/api/v1/legal/chat', { 
+      const res = await api.post('/legal/chat', { 
         message, 
         language: 'english' 
       });

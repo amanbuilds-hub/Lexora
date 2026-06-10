@@ -6,13 +6,12 @@ const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const http = require('http');
 const { Server } = require('socket.io');
-const { connectMongoDB, connectMySQL } = require('./src/config/db');
+const { connectMongoDB } = require('./src/config/db');
 
 const app = express();
 
 // Middleware
 app.use(helmet());
-app.use(require('xss-clean')());
 app.use(cors({ 
   origin: process.env.CORS_ORIGIN || 'http://localhost:5173', 
   credentials: true 
@@ -37,9 +36,6 @@ app.use('/api/v1/cases', require('./src/routes/case.routes.js'));
 app.use('/api/v1/legal', require('./src/routes/legal.routes.js'));
 app.use('/api/v1/earnings', require('./src/routes/earning.routes.js'));
 app.use('/api/v1/grievance', require('./src/routes/grievance.routes.js'));
-
-// Init Cron Jobs
-require('./src/utils/cron.js')();
 
 // Health Check Route
 app.get('/health', (req, res) => {
@@ -68,12 +64,11 @@ const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
   try {
-    // Database Connections
+    // Database Connections (Server starts only after successful MongoDB connection)
     await connectMongoDB();
-    await connectMySQL();
 
-    // Init Model Associations
-    require('./src/models/associations')();
+    // Init Cron Jobs
+    require('./src/utils/cron.js')();
 
     server.listen(PORT, () => {
       console.log(`🚀 Lexora Server running on port ${PORT}`);

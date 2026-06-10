@@ -1,6 +1,6 @@
-const Case = require('../models/case.mysql');
-const Hearing = require('../models/hearing.mysql');
-const User = require('../models/user.mysql');
+const Case = require('../models/case.mongo');
+const Hearing = require('../models/hearing.mongo');
+const User = require('../models/user.mongo');
 
 // @desc    Create a new case (Admin only)
 exports.createCase = async (req, res) => {
@@ -24,13 +24,19 @@ exports.createCase = async (req, res) => {
 // @desc    Get case details with hearings
 exports.getCaseById = async (req, res) => {
   try {
-    const caseData = await Case.findByPk(req.params.id, {
-      include: [
-        { model: Hearing, as: 'hearings' },
-        { model: User, as: 'prisoner', attributes: ['id', 'name', 'prisonerId'] },
-        { model: User, as: 'assignedLawyer', attributes: ['id', 'name', 'email'] }
-      ]
-    });
+    const caseData = await Case.findById(req.params.id)
+      .populate('hearings')
+      .populate({
+        path: 'prisoner',
+        select: 'name prisonerId'
+      })
+      .populate({
+        path: 'lawyer',
+        populate: {
+          path: 'lawyerInfo',
+          select: 'name email'
+        }
+      });
 
     if (!caseData) {
       return res.status(404).json({ message: 'Case not found' });
@@ -46,7 +52,7 @@ exports.getCaseById = async (req, res) => {
 exports.updateCaseStatus = async (req, res) => {
   try {
     const { status, outcome, nextHearingDate } = req.body;
-    const caseData = await Case.findByPk(req.params.id);
+    const caseData = await Case.findById(req.params.id);
 
     if (!caseData) {
       return res.status(404).json({ message: 'Case not found' });
@@ -62,7 +68,7 @@ exports.updateCaseStatus = async (req, res) => {
     // 2. Log Hearing if it's a status update from a hearing
     if (outcome) {
       await Hearing.create({
-        caseId: caseData.id,
+        caseId: caseData._id,
         hearingDate: new Date(),
         outcome,
         nextHearingDate
@@ -87,10 +93,7 @@ exports.getPrisonerCase = async (req, res) => {
     }
 
     // This is a simplified lookup for the demo
-    const caseData = await Case.findOne({
-      where: { prisonerId: req.query.prisonerId }, // In real app, get from profile linkage
-      include: [{ model: Hearing, as: 'hearings' }]
-    });
+    const caseData = await Case.findOne({ prisonerId: req.query.prisonerId }).populate('hearings');
 
     res.status(200).json({ success: true, data: caseData });
   } catch (error) {

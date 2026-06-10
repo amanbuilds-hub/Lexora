@@ -1,6 +1,6 @@
 const axios = require('axios');
-const Lawyer = require('../models/lawyer.mysql');
-const User = require('../models/user.mysql');
+const Lawyer = require('../models/lawyer.mongo');
+const User = require('../models/user.mongo');
 
 // @desc    Chat with AI Legal Assistant
 exports.legalChat = async (req, res) => {
@@ -17,8 +17,9 @@ exports.legalChat = async (req, res) => {
     If the user provides case duration, check eligibility for 436A. 
     Keep responses empathetic and premium. Do not give official legal advice, but inform about rights.`;
 
+    console.log("Using model:", "poolside/laguna-m.1:free");
     const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
-      model: 'google/gemma-3-1b-it:free',
+      model: 'poolside/laguna-m.1:free',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: message }
@@ -32,10 +33,26 @@ exports.legalChat = async (req, res) => {
       }
     });
 
-    const aiMessage = response.data.choices[0].message.content;
+    const choices = response.data?.choices;
+    if (!choices || choices.length === 0 || !choices[0].message || !choices[0].message.content) {
+      return res.status(502).json({ success: false, message: 'Empty or invalid response from AI model' });
+    }
+
+    const aiMessage = choices[0].message.content;
     res.status(200).json({ success: true, message: aiMessage });
   } catch (error) {
     console.error('AI Error:', error.response?.data || error.message);
+    
+    if (error.response) {
+      const status = error.response.status;
+      if (status === 429) {
+        return res.status(429).json({ success: false, message: 'AI rate limit exceeded. Please try again shortly.' });
+      }
+      if (status === 503 || status === 404 || status === 502) {
+        return res.status(503).json({ success: false, message: 'AI model is temporarily unavailable. Please try again later.' });
+      }
+    }
+    
     res.status(500).json({ success: false, message: 'AI Assistant temporarily unavailable' });
   }
 };
@@ -45,20 +62,17 @@ exports.matchLawyers = async (req, res) => {
   try {
     const { caseType, state } = req.query;
 
-    const lawyers = await Lawyer.findAll({
-      where: {
-        specialization: caseType || 'general',
-        state: state || 'Delhi',
-        availability: true
-      },
-      include: [{
-        model: User,
-        as: 'lawyerInfo', // Assuming association set up
-        attributes: ['name', 'email']
-      }],
-      limit: 5,
-      order: [['rating', 'DESC']]
-    });
+    const lawyers = await Lawyer.find({
+      specialization: caseType || 'general',
+      state: state || 'Delhi',
+      availability: true
+    })
+    .populate({
+      path: 'lawyerInfo',
+      select: 'name email'
+    })
+    .limit(5)
+    .sort({ rating: -1 });
 
     res.status(200).json({ success: true, lawyers });
   } catch (error) {

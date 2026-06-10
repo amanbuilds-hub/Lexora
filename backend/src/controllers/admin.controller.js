@@ -1,6 +1,6 @@
-const User = require('../models/user.mysql');
-const Case = require('../models/case.mysql');
-const Hearing = require('../models/hearing.mysql');
+const User = require('../models/user.mongo');
+const Case = require('../models/case.mongo');
+const Hearing = require('../models/hearing.mongo');
 const Grievance = require('../models/grievance.mongo');
 const { SkillProfile, EarningTransaction } = require('../models/earning.mongo');
 const { Parser } = require('json2csv');
@@ -9,12 +9,12 @@ const PDFDocument = require('pdfkit');
 // @desc    Get Admin Dashboard Stats
 exports.getStats = async (req, res) => {
   try {
-    // 1. MySQL Aggregations
-    const totalPrisoners = await User.count({ where: { role: 'prisoner' } });
-    const casesByStatus = await Case.findAll({
-      attributes: ['currentStatus', [Case.sequelize.fn('COUNT', 'id'), 'count']],
-      group: ['currentStatus']
-    });
+    // 1. MongoDB Aggregations for Case/User
+    const totalPrisoners = await User.countDocuments({ role: 'prisoner' });
+    const casesByStatus = await Case.aggregate([
+      { $group: { _id: '$currentStatus', count: { $sum: 1 } } },
+      { $project: { _id: 0, currentStatus: '$_id', count: 1 } }
+    ]);
 
     // 2. MongoDB Aggregations
     const totalEarnings = await EarningTransaction.aggregate([
@@ -73,7 +73,7 @@ exports.exportPrisonReportPDF = async (req, res) => {
   doc.fontSize(14).text(`Generated On: ${new Date().toLocaleString()}`);
   doc.moveDown();
 
-  const totalPrisoners = await User.count({ where: { role: 'prisoner' } });
+  const totalPrisoners = await User.countDocuments({ role: 'prisoner' });
   doc.text(`Total Prisoners: ${totalPrisoners}`);
   
   const pendingGrievances = await Grievance.countDocuments({ status: 'Pending' });

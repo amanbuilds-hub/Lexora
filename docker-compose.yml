@@ -7,14 +7,9 @@ services:
       - "5000:5000"
     environment:
       - NODE_ENV=production
-      - MONGO_URI=${MONGO_URI}
-      - MYSQL_HOST=${MYSQL_HOST}
-      - MYSQL_USER=${MYSQL_USER}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MONGODB_URI=${MONGODB_URI}
     depends_on:
       - db-mongo
-      - db-mysql
 
   frontend:
     build: ./frontend
@@ -27,11 +22,3 @@ services:
     image: mongo:latest
     ports:
       - "27017:27017"
-
-  db-mysql:
-    image: mysql:8.0
-    environment:
-      - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=lexora
-    ports:
-      - "3306:3306"

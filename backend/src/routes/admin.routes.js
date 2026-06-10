@@ -27,9 +27,9 @@ router.get('/dashboard', protect, authorize('admin'), (req, res) => {
 
 // Admin can approve lawyers
 router.patch('/approve-lawyer/:id', protect, authorize('admin'), async (req, res) => {
-  const User = require('../models/user.mysql');
+  const User = require('../models/user.mongo');
   try {
-    const user = await User.findByPk(req.params.id);
+    const user = await User.findById(req.params.id);
     if (!user || user.role !== 'lawyer') {
       return res.status(404).json({ message: 'Lawyer not found' });
     }

@@ -7,10 +7,11 @@ import useVoiceCommand from '../hooks/useVoiceCommand';
 // 1. Kiosk Layout (Restricted, for Prisoners)
 export const KioskLayout = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-slate-900 text-white flex flex-col h-screen overflow-hidden">
       <header className="p-6 bg-lexora-justice border-b border-white/10 flex justify-between items-center">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
           <Shield className="text-lexora-gold" />
           <h1 className="font-bold tracking-widest uppercase">Jail Kiosk Mode</h1>
         </div>
@@ -23,6 +24,10 @@ export const KioskLayout = () => {
         <button className="flex flex-col items-center gap-2 text-blue-200 hover:text-white">
           <div className="bg-white/10 p-4 rounded-2xl"><Globe size={24} /></div>
           <span className="text-xs font-bold">Language</span>
+        </button>
+        <button onClick={() => navigate('/')} className="flex flex-col items-center gap-2 text-red-300 hover:text-red-100">
+          <div className="bg-white/10 p-4 rounded-2xl"><LogOut size={24} /></div>
+          <span className="text-xs font-bold">Exit Kiosk</span>
         </button>
         <button className="flex flex-col items-center gap-2 text-blue-200 hover:text-white">
           <div className="bg-white/10 p-4 rounded-2xl"><Mic size={24} /></div>
@@ -44,10 +49,19 @@ export const FamilyLayout = () => {
   return (
     <div className="min-h-screen bg-slate-50">
       <nav className="glass fixed top-0 w-full z-50 px-6 py-4 flex justify-between items-center shadow-sm">
-        <Link to="/" className="flex items-center gap-2">
-          <div className="bg-lexora-justice p-2 rounded-xl text-white"><Shield size={20} /></div>
-          <h1 className="text-xl font-black text-lexora-justice tracking-tighter">LEXORA</h1>
-        </Link>
+        <div className="flex items-center gap-10">
+          <Link to="/" className="flex items-center gap-2">
+            <div className="bg-lexora-justice p-2 rounded-xl text-white"><Shield size={20} /></div>
+            <h1 className="text-xl font-black text-lexora-justice tracking-tighter">LEXORA</h1>
+          </Link>
+          
+          <div className="hidden lg:flex gap-6">
+            <Link to="/dashboard/family" className="text-sm font-bold text-slate-500 hover:text-lexora-justice">Dashboard</Link>
+            <Link to="/dashboard/family/earnings" className="text-sm font-bold text-slate-500 hover:text-lexora-justice">Earnings</Link>
+            <Link to="/shop" className="text-sm font-bold text-slate-500 hover:text-lexora-justice">Marketplace</Link>
+            <Link to="/grievance" className="text-sm font-bold text-slate-500 hover:text-lexora-justice">Grievances</Link>
+          </div>
+        </div>
         
         <div className="flex items-center gap-6">
           <button onClick={toggleLang} className="flex items-center gap-2 font-bold text-sm text-slate-600 hover:text-lexora-justice">
@@ -59,7 +73,7 @@ export const FamilyLayout = () => {
           >
             <Mic size={18} /> {isListening ? t('voice.listening') : 'Voice'}
           </button>
-          <Link to="/logout" className="bg-slate-100 p-3 rounded-xl text-slate-400 hover:text-red-500 transition-colors">
+          <Link to="/" className="bg-slate-100 p-3 rounded-xl text-slate-400 hover:text-red-500 transition-colors">
             <LogOut size={20} />
           </Link>
         </div>
